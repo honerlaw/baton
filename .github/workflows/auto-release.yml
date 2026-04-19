@@ -1,0 +1,124 @@
+name: Auto Release
+
+# On every push to main, analyze Conventional Commits since the last tag.
+# Bump semver accordingly, tag the commit, then call the Release workflow
+# to build and publish. If no release-worthy commits exist, exit quietly.
+#
+# Commit → bump mapping:
+#   BREAKING CHANGE (body) or `!` in subject type  → major
+#   feat / feat(scope)                             → minor
+#   fix / perf                                     → patch
+#   chore / docs / test / refactor / ci / build / style → no release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force_bump:
+        description: "Force a bump level regardless of commit analysis"
+        required: false
+        type: choice
+        options: ["", "patch", "minor", "major"]
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    name: Compute next version
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.compute.outputs.should_release }}
+      new_tag: ${{ steps.compute.outputs.new_tag }}
+      bump: ${{ steps.compute.outputs.bump }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute next version
+        id: compute
+        env:
+          FORCE_BUMP: ${{ github.event.inputs.force_bump }}
+        run: |
+          set -euo pipefail
+
+          last_tag="$(git describe --tags --abbrev=0 --match 'v*.*.*' 2>/dev/null || echo '')"
+          if [ -z "$last_tag" ]; then
+            range="HEAD"
+            base="v0.0.0"
+            echo "no prior tag; starting from v0.0.0"
+          else
+            range="${last_tag}..HEAD"
+            base="$last_tag"
+            echo "last tag: $last_tag"
+          fi
+
+          subjects="$(git log ${range} --format=%s || true)"
+          bodies="$(git log ${range} --format=%B || true)"
+
+          bump="none"
+          if [ -n "${FORCE_BUMP:-}" ]; then
+            bump="$FORCE_BUMP"
+          else
+            if printf '%s\n' "$subjects" | grep -qE '^[a-zA-Z]+(\([^)]*\))?!:'; then
+              bump="major"
+            elif printf '%s\n' "$bodies" | grep -qE '^BREAKING CHANGE:'; then
+              bump="major"
+            elif printf '%s\n' "$subjects" | grep -qE '^feat(\([^)]*\))?:'; then
+              bump="minor"
+            elif printf '%s\n' "$subjects" | grep -qE '^(fix|perf)(\([^)]*\))?:'; then
+              bump="patch"
+            fi
+          fi
+
+          echo "bump=$bump" >> "$GITHUB_OUTPUT"
+
+          if [ "$bump" = "none" ]; then
+            echo "no release-worthy commits since $base"
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          ver="${base#v}"
+          major="${ver%%.*}"
+          rest="${ver#*.}"
+          minor="${rest%%.*}"
+          patch="${rest#*.}"
+          patch="${patch%%-*}"  # drop prerelease suffix if any
+
+          case "$bump" in
+            major) major=$((major+1)); minor=0; patch=0 ;;
+            minor) minor=$((minor+1)); patch=0 ;;
+            patch) patch=$((patch+1)) ;;
+          esac
+          new_tag="v${major}.${minor}.${patch}"
+
+          echo "bump=$bump  base=$base  new_tag=$new_tag"
+          echo "new_tag=$new_tag" >> "$GITHUB_OUTPUT"
+          echo "should_release=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag
+        if: steps.compute.outputs.should_release == 'true'
+        env:
+          NEW_TAG: ${{ steps.compute.outputs.new_tag }}
+          BUMP: ${{ steps.compute.outputs.bump }}
+        run: |
+          set -euo pipefail
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name  "github-actions[bot]"
+          git tag -a "$NEW_TAG" -m "Release $NEW_TAG (${BUMP} bump)"
+          git push origin "$NEW_TAG"
+          echo "pushed tag $NEW_TAG"
+
+  publish:
+    name: Publish release
+    needs: version
+    if: needs.version.outputs.should_release == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.version.outputs.new_tag }}
+    permissions:
+      contents: write

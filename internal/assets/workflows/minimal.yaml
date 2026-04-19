@@ -1,0 +1,34 @@
+name: minimal
+version: 1.0.0
+description: Context, implement, review — for small changes.
+default_model: anthropic/claude-sonnet-4
+max_reentries: 0
+
+variables:
+  - name: feature_request
+    required: true
+
+stages:
+  - id: context
+    persona: codebase-scout
+    artifact: context.md
+    task: |
+      Gather context for: {{ .vars.feature_request }}
+      Write context.md (frameworks-in-use, relevant-files,
+      existing-patterns).
+
+  - id: implement
+    persona: impl-generalist
+    inputs: [context.md]
+    artifact: implementation.md
+    task: |
+      Implement: {{ .vars.feature_request }}
+      Using context.md. Summarize in implementation.md.
+
+  - id: review
+    persona: code-reviewer-correctness
+    inputs: [implementation.md]
+    artifact: review.md
+    task: |
+      Review the implementation for correctness.
+      Tag findings [BLOCKER|MAJOR|MINOR|NIT].
