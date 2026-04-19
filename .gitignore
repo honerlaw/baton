@@ -1,0 +1,15 @@
+.kilo/
+
+# Built binary
+/baton
+
+# Go build artifacts
+*.exe
+*.test
+*.out
+*.prof
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/

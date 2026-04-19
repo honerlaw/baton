@@ -1,0 +1,147 @@
+name: default
+version: 1.0.0
+description: Seven-stage quality-focused feature workflow.
+default_model: anthropic/claude-sonnet-4
+max_reentries: 1
+
+variables:
+  - name: feature_request
+    description: Plain-English description of what to build.
+    required: true
+
+stages:
+  - id: context
+    name: Context gathering
+    persona: codebase-scout
+    model: anthropic/claude-haiku-4-5
+    artifact: context.md
+    task: |
+      Feature request:
+      {{ .vars.feature_request }}
+
+      Produce `context.md` with sections:
+        - frameworks-in-use
+        - relevant-files
+        - existing-patterns
+        - constraints-observed
+        - related-prior-art
+      Inventory only — no recommendations. Cite file paths for every
+      claim. If you cannot find evidence for a section, write "None found."
+
+  - id: design
+    name: Design
+    persona: design-author
+    inputs: [context.md]
+    artifact: design.md
+    task: |
+      Feature request:
+      {{ .vars.feature_request }}
+
+      context.md has been preloaded. Produce `design.md` with sections:
+      problem-statement, constraints, proposed-approach (ONE approach,
+      not multiple), alternatives-considered, concrete-changes (files
+      to modify, new files, schema/config), failure-modes, test-strategy,
+      rollout-plan.
+
+  - id: design-review
+    name: Design review (parallel)
+    parallel: true
+    members:
+      - id: correctness
+        persona: design-reviewer-correctness
+        inputs: [context.md, design.md]
+        artifact: review-design-correctness.md
+        task: |
+          Review design.md for correctness against the feature request
+          and context.md. Tag findings [BLOCKER|MAJOR|MINOR|NIT].
+      - id: risk
+        persona: design-reviewer-risk
+        inputs: [context.md, design.md]
+        artifact: review-design-risk.md
+        task: |
+          Review design.md for production risk. Blast radius, rollback,
+          data-loss scenarios. Tag findings [BLOCKER|MAJOR|MINOR|NIT].
+      - id: simplicity
+        persona: design-reviewer-simplicity
+        inputs: [context.md, design.md]
+        artifact: review-design-simplicity.md
+        task: |
+          Identify materially simpler alternatives. Propose only
+          concrete alternatives, not vague "consider X" advice.
+          Tag findings [BLOCKER|MAJOR|MINOR|NIT].
+
+  - id: design-synthesis
+    name: Design synthesis
+    persona: design-synthesizer
+    inputs:
+      - design.md
+      - review-design-correctness.md
+      - review-design-risk.md
+      - review-design-simplicity.md
+    artifact: design-final.md
+    task: |
+      Synthesize a final design. Produce:
+        1. `design-final.md` — self-contained final design.
+        2. `design-response.md` — every review point with
+           accepted|rejected|deferred and reasoning.
+      Resolve reviewer conflicts explicitly.
+
+  - id: implementation
+    name: Implementation
+    persona: impl-generalist
+    inputs: [context.md, design-final.md]
+    artifact: implementation-generalist.md
+    task: |
+      Implement design-final.md. Write code via write_file. When done,
+      produce implementation-generalist.md summarizing changes, commands
+      run, deviations, and follow-ups.
+
+  - id: code-review
+    name: Implementation review (parallel)
+    parallel: true
+    members:
+      - id: conformance
+        persona: code-reviewer-conformance
+        inputs: [design-final.md, implementation-generalist.md]
+        artifact: review-code-conformance.md
+        task: |
+          Does the code do what design-final.md specified?
+          List gaps and deviations. Tag findings
+          [BLOCKER|MAJOR|MINOR|NIT].
+      - id: correctness
+        persona: code-reviewer-correctness
+        inputs: [design-final.md, implementation-generalist.md]
+        artifact: review-code-correctness.md
+        task: |
+          Line-level correctness: edge cases, error handling, races.
+          Read the actual code via read_file. Tag findings.
+      - id: tests
+        persona: code-reviewer-tests
+        inputs: [design-final.md, implementation-generalist.md]
+        artifact: review-code-tests.md
+        task: |
+          Do tests cover what the design requires? Read test files via
+          read_file. Tag findings.
+
+  - id: verdict
+    name: Final synthesis
+    persona: final-synthesizer
+    inputs:
+      - design-final.md
+      - implementation-generalist.md
+      - review-code-conformance.md
+      - review-code-correctness.md
+      - review-code-tests.md
+    artifact: verdict.md
+    task: |
+      Decide: accept | revise_impl | revise_design. Emit a fenced
+      `json` block as the first content in verdict.md with:
+        {"decision": "...", "rationale": "...", "fixes": [...]}
+      Followed by prose explanation.
+    verdict:
+      parser: json_block
+      field: .decision
+      routes:
+        accept: ""
+        revise_impl: implementation
+        revise_design: design

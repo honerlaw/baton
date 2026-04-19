@@ -1,0 +1,36 @@
+name: iter-design
+version: 1.0.0
+description: Design with up to 3 revision rounds, then implement.
+default_model: anthropic/claude-sonnet-4
+max_reentries: 3
+
+variables:
+  - name: feature_request
+    required: true
+
+stages:
+  - id: design
+    persona: design-author
+    artifact: design.md
+    task: |
+      Design: {{ .vars.feature_request }}
+
+  - id: critique
+    persona: design-reviewer-correctness
+    inputs: [design.md]
+    artifact: critique.md
+    task: |
+      Critique design.md. First content must be a fenced json block:
+      {"decision": "accept" | "revise", "fixes": [...]}
+    verdict:
+      parser: json_block
+      field: .decision
+      routes:
+        accept: ""
+        revise: design
+
+  - id: implement
+    persona: impl-generalist
+    inputs: [design.md]
+    artifact: implementation.md
+    task: Implement the final design.

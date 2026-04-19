@@ -1,0 +1,15 @@
+version: 1
+model: anthropic/claude-sonnet-4
+max_turns: 25
+
+stages:
+  - id: plan
+    persona: planner
+    task: |
+      Review the repo and produce a numbered implementation plan.
+    tools: [read_file, list_files]
+
+  - id: implement
+    persona: implementer
+    task: |
+      Execute the plan from the previous stage. Write all files.
