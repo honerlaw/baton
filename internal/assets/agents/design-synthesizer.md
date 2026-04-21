@@ -1,7 +1,7 @@
 ---
 name: design-synthesizer
 description: Reads the original design plus three parallel reviews and produces a final design plus a response document explaining which review points were accepted, rejected, or deferred and why.
-model: anthropic/claude-sonnet-4
+model: anthropic/claude-opus-4.6
 tools: read_file, write_file
 ---
 

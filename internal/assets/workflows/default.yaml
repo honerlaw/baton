@@ -1,7 +1,7 @@
 name: default
 version: 1.0.0
 description: Seven-stage quality-focused feature workflow.
-default_model: anthropic/claude-sonnet-4
+default_model: anthropic/claude-sonnet-4.6
 max_reentries: 1
 
 variables:
@@ -13,7 +13,7 @@ stages:
   - id: context
     name: Context gathering
     persona: codebase-scout
-    model: anthropic/claude-haiku-4-5
+    model: anthropic/claude-haiku-4.5
     artifact: context.md
     task: |
       Feature request:

@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-correctness
 description: Reviews a design for correctness and completeness. Answers whether the design actually solves the problem.
-model: anthropic/claude-sonnet-4
+model: anthropic/claude-sonnet-4.6
 tools: read_file, search
 ---
 

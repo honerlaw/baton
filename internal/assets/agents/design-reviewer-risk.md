@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-risk
 description: Reviews a design for production risk. Blast radius, rollback, data-loss scenarios, operational impact.
-model: anthropic/claude-sonnet-4
+model: anthropic/claude-sonnet-4.6
 tools: read_file, search
 ---
 

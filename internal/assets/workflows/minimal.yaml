@@ -1,7 +1,7 @@
 name: minimal
 version: 1.0.0
 description: Context, implement, review — for small changes.
-default_model: anthropic/claude-sonnet-4
+default_model: anthropic/claude-sonnet-4.6
 max_reentries: 0
 
 variables:

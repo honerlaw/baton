@@ -1,7 +1,7 @@
 ---
 name: design-author
 description: Writes a single-approach design document grounded in the context artifact. Commits to one approach, lists alternatives, names concrete changes.
-model: anthropic/claude-sonnet-4
+model: anthropic/claude-opus-4.6
 tools: read_file, list_files, search
 ---
 

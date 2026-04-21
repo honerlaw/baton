@@ -1,7 +1,7 @@
 ---
 name: impl-db
 description: Database-domain implementer (schema, migrations, indexes, query changes).
-model: anthropic/claude-sonnet-4
+model: minimax/minimax-m2.7
 tools: read_file, write_file, list_files, search, bash
 ---
 
