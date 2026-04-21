@@ -12,13 +12,13 @@ import (
 	"strings"
 )
 
-//go:embed agents/*.md workflows/*.yaml
+//go:embed personas/*.md workflows/*.yaml
 var FS embed.FS
 
-// PersonasFS returns an fs.FS rooted at the embedded agents directory.
-// Personas are at the root of the returned FS (no "agents/" prefix).
+// PersonasFS returns an fs.FS rooted at the embedded personas directory.
+// Personas are at the root of the returned FS (no "personas/" prefix).
 func PersonasFS() fs.FS {
-	sub, err := fs.Sub(FS, "agents")
+	sub, err := fs.Sub(FS, "personas")
 	if err != nil {
 		// embed guarantees directory exists; panic is a bug.
 		panic(err)
@@ -41,14 +41,14 @@ func WorkflowsFS() fs.FS {
 //
 // Layout written:
 //
-//	<dstRoot>/.claude/agents/*.md
+//	<dstRoot>/.baton/personas/*.md
 //	<dstRoot>/.baton/workflows/*.yaml
 func Scaffold(dstRoot string, overwrite bool) (wrote []string, err error) {
 	pairs := []struct {
 		embedDir string
 		destSub  string
 	}{
-		{"agents", filepath.Join(".claude", "agents")},
+		{"personas", filepath.Join(".baton", "personas")},
 		{"workflows", filepath.Join(".baton", "workflows")},
 	}
 	for _, p := range pairs {

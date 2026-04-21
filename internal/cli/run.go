@@ -93,7 +93,7 @@ func runWorkflow(ctx context.Context, f runFlags) error {
 		return err
 	}
 	personas := &persona.ChainLoader{Loaders: []persona.Loader{
-		persona.DirLoader(".claude/agents", "project"),
+		persona.DirLoader(".baton/personas", "project"),
 		&persona.FSLoader{FS: assets.PersonasFS(), Name: "embedded"},
 	}}
 	if res := (&workflow.Validator{Personas: personas, Tools: reg}).Validate(w); !res.OK() {

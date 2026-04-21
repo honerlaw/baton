@@ -57,7 +57,7 @@ export OPENROUTER_API_KEY=sk-or-...
 cd your-project
 
 # Write the default personas and workflows into the project
-# (.claude/agents/*.md and .baton/workflows/*.yaml)
+# (.baton/personas/*.md and .baton/workflows/*.yaml)
 baton init
 
 # Run the default seven-stage workflow against a feature request
@@ -89,7 +89,7 @@ Artifacts land in `.baton/runs/<ulid>/`:
 |---|---|
 | `baton run` | Execute a workflow. Auto-detects TTY; uses Bubble Tea TUI when interactive, plaintext otherwise. |
 | `baton validate <file>` | Validate a workflow YAML file. Exits 2 on errors. |
-| `baton init` | Scaffold embedded personas and workflows into `.claude/agents/` and `.baton/workflows/`. |
+| `baton init` | Scaffold embedded personas and workflows into `.baton/personas/` and `.baton/workflows/`. |
 | `baton personas` | List known personas (project overrides + embedded defaults). |
 | `baton version` | Print the binary version. |
 
@@ -194,9 +194,10 @@ enough re-entry budget all produce errors with file:line locations.
 
 ## Writing a custom persona
 
-Personas live in `.claude/agents/*.md` and use the Claude-format
-frontmatter. Project files take precedence over embedded defaults, so
-you can override a shipped persona by writing a file with the same name.
+Personas live in `.baton/personas/*.md` and use the same YAML-frontmatter
+Markdown format Claude Code uses for its subagents. Project files take
+precedence over embedded defaults, so you can override a shipped persona
+by writing a file with the same name.
 
 ```markdown
 ---

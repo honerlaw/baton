@@ -16,7 +16,7 @@ func newInitCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Scaffold the default personas and workflows into the current project.",
-		Long: `Write the embedded personas (.claude/agents/*.md) and workflows
+		Long: `Write the embedded personas (.baton/personas/*.md) and workflows
 (.baton/workflows/*.yaml) to disk. Existing files are preserved unless
 --force is passed.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
