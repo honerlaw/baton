@@ -27,7 +27,7 @@ func newValidateCmd() *cobra.Command {
 				return err
 			}
 			loader := &persona.ChainLoader{Loaders: []persona.Loader{
-				persona.DirLoader(".claude/agents", "project"),
+				persona.DirLoader(".baton/personas", "project"),
 				&persona.FSLoader{FS: assets.PersonasFS(), Name: "embedded"},
 			}}
 			v := &workflow.Validator{Personas: loader, Tools: reg}

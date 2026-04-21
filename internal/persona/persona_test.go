@@ -52,8 +52,8 @@ body
 
 func TestFSLoader_LoadAndList(t *testing.T) {
 	fsys := fstest.MapFS{
-		"agents/a.md": &fstest.MapFile{Data: []byte(okDoc)},
-		"agents/b.md": &fstest.MapFile{Data: []byte(`---
+		"personas/a.md": &fstest.MapFile{Data: []byte(okDoc)},
+		"personas/b.md": &fstest.MapFile{Data: []byte(`---
 name: b
 description: d
 ---
@@ -62,7 +62,7 @@ body
 `)},
 	}
 	// Frontmatter name doesn't match filename "a" => must error.
-	l := &FSLoader{FS: fsys, Dir: "agents"}
+	l := &FSLoader{FS: fsys, Dir: "personas"}
 	if _, err := l.Load("a"); err == nil {
 		t.Fatal("expected name mismatch error")
 	}
