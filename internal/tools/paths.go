@@ -36,3 +36,25 @@ func under(abs, root string) bool {
 	}
 	return abs == r || strings.HasPrefix(abs, r+string(filepath.Separator))
 }
+
+// resolvedUnder reports whether path, after resolving symlinks, is inside
+// root (also symlink-resolved). Used to defend tools that enumerate the
+// filesystem against symlink-based escapes. Returns false on
+// EvalSymlinks errors (e.g. broken links or missing files) — the caller
+// should treat those as "not safe to include."
+//
+// Both sides are symlink-resolved because some OSes (notably macOS,
+// where /var is a symlink to /private/var) would otherwise produce a
+// resolved path that does not textually share a prefix with a root that
+// was passed in un-resolved.
+func resolvedUnder(path, root string) bool {
+	resolvedPath, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		return false
+	}
+	resolvedRoot, err := filepath.EvalSymlinks(root)
+	if err != nil {
+		return false
+	}
+	return under(resolvedPath, resolvedRoot)
+}
