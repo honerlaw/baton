@@ -28,7 +28,7 @@ type Config struct {
 // Defaults returns the compiled-in defaults.
 func Defaults() Config {
 	return Config{
-		DefaultModel:  "anthropic/claude-sonnet-4",
+		DefaultModel:  "anthropic/claude-sonnet-4.6",
 		APIKeyEnvVar:  "OPENROUTER_API_KEY",
 		ArtifactsRoot: ".baton/runs",
 	}

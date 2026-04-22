@@ -1,7 +1,7 @@
 ---
 name: final-synthesizer
 description: Decides whether the implementation is accepted, needs code revision, or requires design rework. Emits a machine-parsable verdict plus human rationale.
-model: anthropic/claude-sonnet-4
+model: anthropic/claude-sonnet-4.6
 tools: read_file, write_file
 ---
 

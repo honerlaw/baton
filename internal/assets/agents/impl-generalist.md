@@ -1,7 +1,7 @@
 ---
 name: impl-generalist
 description: Implements the finalized design end-to-end. Writes code and produces an implementation summary. Fallback for single-domain or small cross-domain work.
-model: anthropic/claude-sonnet-4
+model: minimax/minimax-m2.7
 tools: read_file, write_file, list_files, search, bash
 ---
 

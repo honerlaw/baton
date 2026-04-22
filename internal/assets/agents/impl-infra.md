@@ -1,7 +1,7 @@
 ---
 name: impl-infra
 description: Infrastructure-domain implementer (build, deploy, CI, container images, IaC).
-model: anthropic/claude-sonnet-4
+model: minimax/minimax-m2.7
 tools: read_file, write_file, list_files, search, bash
 ---
 

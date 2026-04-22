@@ -1,7 +1,7 @@
 ---
 name: codebase-scout
 description: Reads the codebase and feature request. Produces an inventory-only context.md with file-path citations. No recommendations, no design choices.
-model: anthropic/claude-haiku-4-5
+model: anthropic/claude-haiku-4.5
 tools: read_file, list_files, search
 ---
 

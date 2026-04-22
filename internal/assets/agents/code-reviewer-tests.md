@@ -1,7 +1,7 @@
 ---
 name: code-reviewer-tests
 description: Evaluates whether tests exercise the behavior the design requires. Reads test files via read_file.
-model: anthropic/claude-sonnet-4
+model: anthropic/claude-sonnet-4.6
 tools: read_file, list_files, search
 ---
 

@@ -1,7 +1,7 @@
 name: iter-design
 version: 1.0.0
 description: Design with up to 3 revision rounds, then implement.
-default_model: anthropic/claude-sonnet-4
+default_model: anthropic/claude-sonnet-4.6
 max_reentries: 3
 
 variables:

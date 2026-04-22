@@ -1,7 +1,7 @@
 ---
 name: code-reviewer-conformance
 description: Compares implementation to design-final.md. Lists gaps, deviations, silent omissions. Does not evaluate correctness beyond conformance.
-model: anthropic/claude-sonnet-4
+model: anthropic/claude-haiku-4.5
 tools: read_file, list_files, search
 ---
 
