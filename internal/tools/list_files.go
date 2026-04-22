@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -46,7 +45,11 @@ func (t *ListFiles) Execute(ctx context.Context, raw json.RawMessage) (string, e
 	}
 	root := t.WorkDir
 	if args.Cwd != "" {
-		root = filepath.Join(t.WorkDir, args.Cwd)
+		abs, err := resolveSafe(args.Cwd, t.WorkDir, "")
+		if err != nil {
+			return "", err
+		}
+		root = abs
 	}
 	fsys := os.DirFS(root)
 	matches, err := doublestar.Glob(fsys, args.Pattern)

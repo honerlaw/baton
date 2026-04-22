@@ -51,7 +51,11 @@ func (t *Search) Execute(ctx context.Context, raw json.RawMessage) (string, erro
 	}
 	root := t.WorkDir
 	if args.Path != "" {
-		root = filepath.Join(t.WorkDir, args.Path)
+		abs, err := resolveSafe(args.Path, t.WorkDir, "")
+		if err != nil {
+			return "", err
+		}
+		root = abs
 	}
 	if rgPath, err := exec.LookPath("rg"); err == nil {
 		return runRipgrep(ctx, rgPath, root, args.Pattern, args.Glob)
