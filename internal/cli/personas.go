@@ -15,7 +15,7 @@ func newPersonasCmd() *cobra.Command {
 		Short: "List personas known to baton (project overrides + embedded defaults).",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			loader := &persona.ChainLoader{Loaders: []persona.Loader{
-				persona.DirLoader(".claude/agents", "project"),
+				persona.DirLoader(".baton/personas", "project"),
 				&persona.FSLoader{FS: assets.PersonasFS(), Name: "embedded"},
 			}}
 			ps, err := loader.List()
