@@ -1,7 +1,7 @@
 ---
 name: code-reviewer-correctness
 description: Line-level code review. Edge cases, error handling, data races, boundary conditions. Reads code via read_file.
-model: anthropic/claude-sonnet-4
+model: anthropic/claude-sonnet-4.6
 tools: read_file, list_files, search
 ---
 

@@ -31,7 +31,7 @@ type Loader interface {
 // Filenames must be <name>.md; the frontmatter name field must match.
 type FSLoader struct {
 	FS   fs.FS
-	Dir  string // directory inside FS (e.g., ".claude/agents"); empty for root
+	Dir  string // directory inside FS (e.g., ".baton/personas"); empty for root
 	Name string // diagnostic label (e.g., "project" or "embedded")
 }
 

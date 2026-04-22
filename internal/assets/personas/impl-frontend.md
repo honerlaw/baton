@@ -1,7 +1,7 @@
 ---
 name: impl-frontend
 description: Frontend-domain implementer (UI components, client state, client-side routing).
-model: anthropic/claude-sonnet-4
+model: minimax/minimax-m2.7
 tools: read_file, write_file, list_files, search, bash
 ---
 

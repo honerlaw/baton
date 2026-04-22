@@ -46,16 +46,29 @@ func (t *ListFiles) Execute(ctx context.Context, raw json.RawMessage) (string, e
 	}
 	root := t.WorkDir
 	if args.Cwd != "" {
-		root = filepath.Join(t.WorkDir, args.Cwd)
+		abs, err := resolveSafe(args.Cwd, t.WorkDir, "")
+		if err != nil {
+			return "", err
+		}
+		root = abs
 	}
 	fsys := os.DirFS(root)
 	matches, err := doublestar.Glob(fsys, args.Pattern)
 	if err != nil {
 		return "", err
 	}
-	sort.Strings(matches)
-	if len(matches) == 0 {
+	// Filter any match whose real (symlink-resolved) path escapes WorkDir.
+	// os.DirFS does not sandbox symlinks; a symlink inside root pointing
+	// outside would otherwise be listable.
+	kept := matches[:0]
+	for _, m := range matches {
+		if resolvedUnder(filepath.Join(root, m), t.WorkDir) {
+			kept = append(kept, m)
+		}
+	}
+	sort.Strings(kept)
+	if len(kept) == 0 {
 		return "(no matches)", nil
 	}
-	return strings.Join(matches, "\n"), nil
+	return strings.Join(kept, "\n"), nil
 }

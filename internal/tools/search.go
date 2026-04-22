@@ -51,12 +51,18 @@ func (t *Search) Execute(ctx context.Context, raw json.RawMessage) (string, erro
 	}
 	root := t.WorkDir
 	if args.Path != "" {
-		root = filepath.Join(t.WorkDir, args.Path)
+		abs, err := resolveSafe(args.Path, t.WorkDir, "")
+		if err != nil {
+			return "", err
+		}
+		root = abs
 	}
 	if rgPath, err := exec.LookPath("rg"); err == nil {
+		// ripgrep does not follow symlinks by default, so it is already
+		// confined to `root` transitively.
 		return runRipgrep(ctx, rgPath, root, args.Pattern, args.Glob)
 	}
-	return walkSearch(root, args.Pattern, args.Glob)
+	return walkSearch(root, t.WorkDir, args.Pattern, args.Glob)
 }
 
 func runRipgrep(ctx context.Context, rg, root, pattern, glob string) (string, error) {
@@ -77,7 +83,7 @@ func runRipgrep(ctx context.Context, rg, root, pattern, glob string) (string, er
 	return buf.String(), nil
 }
 
-func walkSearch(root, pattern, glob string) (string, error) {
+func walkSearch(root, workDir, pattern, glob string) (string, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
 		return "", fmt.Errorf("bad regex: %w", err)
@@ -91,6 +97,12 @@ func walkSearch(root, pattern, glob string) (string, error) {
 			if d.Name() == ".git" || d.Name() == "node_modules" {
 				return fs.SkipDir
 			}
+			return nil
+		}
+		// filepath.WalkDir does not recurse into symlinked directories,
+		// but it does visit symlinked files. os.ReadFile below would
+		// follow the symlink and leak content from outside workDir.
+		if !resolvedUnder(path, workDir) {
 			return nil
 		}
 		rel, _ := filepath.Rel(root, path)

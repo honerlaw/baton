@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-simplicity
 description: Reviews a design for unnecessary complexity. Proposes only concrete simpler alternatives.
-model: anthropic/claude-sonnet-4
+model: anthropic/claude-sonnet-4.6
 tools: read_file, search
 ---
 

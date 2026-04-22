@@ -54,7 +54,7 @@ internal/agents/  internal/logx/  internal/runtime/
    `default_model:` > `Orchestrator.DefaultModel` (tool-level).
 
 5. **Personas are load-bearing.** The shipped personas in
-   `internal/assets/agents/` follow a specific behavior-first style
+   `internal/assets/personas/` follow a specific behavior-first style
    (how-you-think / required-output / checklist / escalation / scope).
    Changing a persona can meaningfully change output quality. Treat
    edits with the same seriousness as changing a prompt that runs in
